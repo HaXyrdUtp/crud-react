@@ -101,7 +101,7 @@ function App() {
     <div className="container">
       <div className="row">
         <div className="col">
-          <h2>Clientesa</h2>
+          <h2>Clientes</h2>
           <table className="table">
             <thead>
               <tr>
