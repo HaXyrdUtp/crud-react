@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { Table, Button } from 'antd';
+
+const estatusOptions = ['En curso', 'Stand by', 'Terminado'];
 
 function App() {
   const [clientes, setClientes] = useState([]);
@@ -11,13 +14,11 @@ function App() {
   const [mapa, setMapa] = useState('');
   const [estatus, setEstatus] = useState('');
   const [currentClienteId, setCurrentClienteId] = useState(null);
-  const estatusOptions = ['En curso', 'Stand by', 'Terminado'];
 
   useEffect(() => {
     const getClientes = async () => {
       const datos = await getDocs(collection(db, 'Proyectos'));
       setClientes(datos.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-      console.log(datos);
     };
     getClientes();
   }, []);
@@ -97,36 +98,61 @@ function App() {
     }
   };
 
+  const columns = [
+    {
+      title: 'Nombre del Cliente',
+      dataIndex: 'clienteNombre',
+      filters: clientes.map(cliente => ({
+        text: cliente.clienteNombre,
+        value: cliente.clienteNombre,
+      })),
+      onFilter: (value, record) => record.clienteNombre.indexOf(value) === 0,
+    },
+    {
+      title: 'Nombre del Proyecto',
+      dataIndex: 'nombre',
+      sorter: (a, b) => a.nombre.length - b.nombre.length,
+    },
+    {
+      title: 'Ubicación',
+      dataIndex: 'ubicacion',
+    },
+    {
+      title: 'Estatus del Proyecto',
+      dataIndex: 'estatus',
+      filters: estatusOptions.map(estatus => ({
+        text: estatus,
+        value: estatus,
+      })),
+      onFilter: (value, record) => record.estatus === value,
+    },
+    {
+      title: 'Acciones',
+      dataIndex: 'acciones',
+      render: (_, record) => (
+        <>
+          <Button type="link" onClick={() => editarCliente(record)}>Editar</Button>
+          <Button type="link" onClick={() => eliminarCliente(record.id)}>Eliminar</Button>
+        </>
+      ),
+    },
+  ];
+
+  const onChange = (pagination, filters, sorter, extra) => {
+    console.log('params', pagination, filters, sorter, extra);
+  };
+
   return (
     <div className="container">
       <div className="row">
         <div className="col">
           <h2>Clientes</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Nombre Del Cliente</th>
-                <th>Nombre del Proyecto</th>
-                <th>Ubicacion</th>
-                <th>Estatus del Proyecto</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clientes.map(item => (
-                <tr key={item.id}>
-                  <td>{item.clienteNombre}</td>
-                  <td>{item.nombre}</td>
-                  <td>{item.ubicacion}</td>
-                  <td>{item.estatus}</td>
-                  <td>
-                    <button className="btn btn-warning btn-sm" onClick={() => editarCliente(item)}>Editar</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => eliminarCliente(item.id)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            columns={columns}
+            dataSource={clientes.map(cliente => ({ ...cliente, key: cliente.id }))}
+            onChange={onChange}
+            pagination={{ pageSize: 5 }}
+          />
         </div>
         <div className="col">
           <h2>{currentClienteId ? 'Editar Cliente' : 'Agregar Cliente'}</h2>
