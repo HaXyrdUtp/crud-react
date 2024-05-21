@@ -2,9 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { Table, Button } from 'antd';
+import { Table, Button, Input, Select, Space, Divider, Layout } from 'antd';
+import './App.css'
 
-const estatusOptions = ['En curso', 'Stand by', 'Terminado'];
+//const estatusOptions = ['En curso', 'Stand by', 'Terminado'];
+const {Content} = Layout;
+
 
 function App() {
   const [clientes, setClientes] = useState([]);
@@ -82,7 +85,7 @@ function App() {
       setUbicacion('');
       setMapa('');
       setEstatus('');
-      setCurrentClienteId(null);
+      setCurrentClienteId(false);
     } catch (error) {
       console.log(error);
     }
@@ -120,10 +123,7 @@ function App() {
     {
       title: 'Estatus del Proyecto',
       dataIndex: 'estatus',
-      filters: estatusOptions.map(estatus => ({
-        text: estatus,
-        value: estatus,
-      })),
+  
       onFilter: (value, record) => record.estatus === value,
     },
     {
@@ -143,10 +143,18 @@ function App() {
   };
 
   return (
+    
     <div className="container">
+      <h1>CRUD de Proyectos</h1>
       <div className="row">
-        <div className="col">
-          <h2>Clientes</h2>
+        <div 
+          className="col"
+          style={{
+            padding: 24,
+            minHeight: 100
+          }}  
+        >
+          <Divider orientation="left" style={{fontSize:25}}>Clientes</Divider>
           <Table
             columns={columns}
             dataSource={clientes.map(cliente => ({ ...cliente, key: cliente.id }))}
@@ -154,20 +162,45 @@ function App() {
             pagination={{ pageSize: 5 }}
           />
         </div>
-        <div className="col">
-          <h2>{currentClienteId ? 'Editar Cliente' : 'Agregar Cliente'}</h2>
+
+        <div 
+          className="col"
+          style={{
+            padding: 24,
+            minHeight: 360
+          }}
+        >
+        <Divider orientation="left" style={{fontSize:25}}>{currentClienteId ? 'Editar Cliente' : 'Agregar Cliente'}</Divider>
           <form onSubmit={currentClienteId ? actualizarCliente : agregarCliente}>
-            <input type="text" className="form-control mb-2" placeholder="Ingrese el cliente" value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} />
-            <input type="text" className="form-control mb-2" placeholder="Ingrese el nombre" value={nombre} onChange={e => setNombre(e.target.value)} />
-            <input type="text" className="form-control mb-2" placeholder="Ingrese la ubicación" value={ubicacion} onChange={e => setUbicacion(e.target.value)} />
-            <input type="text" className="form-control mb-2" placeholder="Ingrese el mapa" value={mapa} onChange={e => setMapa(e.target.value)} />
-            <select className="form-control mb-2" value={estatus} onChange={e => setEstatus(e.target.value)}>
-              <option value="">Seleccione el estatus</option>
-              {estatusOptions.map(option => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-            <button className="btn btn-primary btn-block" type="submit">{currentClienteId ? 'Editar' : 'Agregar'}</button>
+            <Space size ="middle">
+              <Input type="text" className="form-control mb-2" placeholder="Ingrese el cliente" value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} style={{width: '100%'}}/>
+              <Input type="text" className="form-control mb-2" placeholder="Ingrese el nombre" value={nombre} onChange={e => setNombre(e.target.value)} style={{width: '100%'}}/>
+              <Input type="text" className="form-control mb-2" placeholder="Ingrese la ubicación" value={ubicacion} onChange={e => setUbicacion(e.target.value)} style={{width: '100%'}}/>
+              <Input type="text" className="form-control mb-2" placeholder="Ingrese el mapa" value={mapa} onChange={e => setMapa(e.target.value)} style={{width: '100%'}}/>
+              <Select 
+                className="form-control mb-2"
+                style={
+                  {width: 130}
+                }
+                defaultValue="Estatus"
+                onChange={e => setEstatus(e)}
+                options={[
+                  {
+                    value: 'En curso',
+                    label: 'En curso'
+                  },
+                  {
+                    value: 'Stand By',
+                    label: 'Stand By'
+                  },
+                  {
+                    value: 'Terminado',
+                    label: 'Terminado'
+                  }
+                ]}  
+              />
+              <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">{currentClienteId ? 'Editar' : 'Agregar'}</Button>
+            </Space>
           </form>
         </div>
       </div>
