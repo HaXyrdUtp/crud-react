@@ -17,6 +17,7 @@ function App() {
     const getClientes = async () => {
       const datos = await getDocs(collection(db, 'Proyectos'));
       setClientes(datos.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+      console.log(datos);
     };
     getClientes();
   }, []);
@@ -140,7 +141,7 @@ function App() {
                 <option key={option} value={option}>{option}</option>
               ))}
             </select>
-            <button className="btn btn-primary btn-block" type="submit">{currentClienteId ? 'Confirmar' : 'Agregar'}</button>
+            <button className="btn btn-primary btn-block" type="submit">{currentClienteId ? 'Editar' : 'Agregar'}</button>
           </form>
         </div>
       </div>
