@@ -1,47 +1,64 @@
 /* Ensure the layout takes up the full height of the page */
 html, body, #root, .ant-layout {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Ensure the Sider and Content take up full height */
-  .ant-layout-sider, .ant-layout-content {
-    height: 100%;
-  }
-  
-  /* Additional styling to remove margins and paddings */
-  .ant-layout {
-    display: flex;
-  }
-  
-  .ant-layout-content {
-    padding: 24px;
-    overflow: auto;
-  }
-  
-  /* Ensure the table and form container fill available space */
-  .container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  
-  .row {
-    display: flex;
-    flex-grow: 1;
-  }
-  
-  .col {
-    flex: 1;
-    padding: 24px;
-  }
-  
-  .form-control {
-    width: 100%;
-  }
-  
-  .btn-block {
-    width: 100%;
-  }
-  
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure the Sider and Content take up full height */
+.ant-layout-sider, .ant-layout-content {
+  height: 100%;
+}
+
+/* Additional styling to remove margins and paddings */
+.ant-layout {
+  display: flex;
+}
+
+.ant-layout-content {
+  padding: 24px;
+  overflow: auto;
+}
+
+/* Ensure the table and form container fill available space */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.row {
+  display: flex;
+  flex-grow: 1;
+}
+
+.col {
+  flex: 1;
+  padding: 24px;
+}
+
+.form-control {
+  width: 100%;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Custom header style */
+.header {
+  padding: 0;
+  background: #fff;
+}
+
+/* Custom button style */
+.menu-button {
+  font-size: 16px;
+  width: 64px;
+  height: 64px;
+}
+
+/* Custom layout style */
+.layout {
+  height: 100%;
+}

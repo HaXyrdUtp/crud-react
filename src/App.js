@@ -66,7 +66,7 @@ const App = () => {
     setMapa(cliente.mapa);
     setEstatus(cliente.estatus);
     setCurrentClienteId(cliente.id);
-    setSelectedNav('3'); // Switch to the 'nav 3' view
+    setSelectedNav('3'); // Switch to the 'nav 3' view for editing
   };
 
   const actualizarCliente = async (e) => {
@@ -92,8 +92,8 @@ const App = () => {
       setUbicacion('');
       setMapa('');
       setEstatus('');
-      setCurrentClienteId(false);
-      setSelectedNav('1'); // Switch back to the 'Clientes' view
+      setCurrentClienteId(null);
+      setSelectedNav('1'); // Switch back to the 'Clientes' view after updating
     } catch (error) {
       console.log(error);
     }
@@ -104,7 +104,6 @@ const App = () => {
       await deleteDoc(doc(db, 'Proyectos', id));
       const arrayFiltrado = clientes.filter(item => item.id !== id);
       setClientes(arrayFiltrado);
-      setSelectedNav('3'); // Switch to the 'nav 3' view
     } catch (error) {
       console.log(error);
     }
@@ -118,6 +117,7 @@ const App = () => {
         text: cliente.clienteNombre,
         value: cliente.clienteNombre,
       })),
+      sorter: (a, b) => a.clienteNombre.length - b.clienteNombre.length,
       onFilter: (value, record) => record.clienteNombre.indexOf(value) === 0,
     },
     {
@@ -167,10 +167,8 @@ const App = () => {
       case '2':
         return (
           <>
-            <Divider orientation="left" style={{ fontSize: 25 }}>
-              {currentClienteId ? 'Editar Cliente' : 'Agregar Cliente'}
-            </Divider>
-            <form onSubmit={currentClienteId ? actualizarCliente : agregarCliente}>
+            <Divider orientation="left" style={{ fontSize: 25 }}>Agregar Cliente</Divider>
+            <form onSubmit={agregarCliente}>
               <Space size="middle" direction="vertical" style={{ width: '100%' }}>
                 <Input
                   type="text"
@@ -211,7 +209,7 @@ const App = () => {
                   ]}
                 />
                 <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">
-                  {currentClienteId ? 'Editar' : 'Agregar'}
+                  Agregar
                 </Button>
               </Space>
             </form>
@@ -220,12 +218,52 @@ const App = () => {
       case '3':
         return (
           <>
-            <Divider orientation="left" style={{ fontSize: 25 }}>Información del Cliente</Divider>
-            <p>Nombre del Cliente: {clienteNombre}</p>
-            <p>Nombre del Proyecto: {nombre}</p>
-            <p>Ubicación: {ubicacion}</p>
-            <p>Mapa: {mapa}</p>
-            <p>Estatus: {estatus}</p>
+            <Divider orientation="left" style={{ fontSize: 25 }}>Editar Cliente</Divider>
+            <form onSubmit={actualizarCliente}>
+              <Space size="middle" direction="vertical" style={{ width: '100%' }}>
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el cliente"
+                  value={clienteNombre}
+                  onChange={e => setClienteNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el nombre"
+                  value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese la ubicación"
+                  value={ubicacion}
+                  onChange={e => setUbicacion(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el mapa"
+                  value={mapa}
+                  onChange={e => setMapa(e.target.value)}
+                />
+                <Select
+                  className="form-control mb-2"
+                  defaultValue={estatus}
+                  onChange={e => setEstatus(e)}
+                  options={[
+                    { value: 'En curso', label: 'En curso' },
+                    { value: 'Stand By', label: 'Stand By' },
+                    { value: 'Terminado', label: 'Terminado' }
+                  ]}
+                />
+                <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">
+                  Confirmar
+                </Button>
+              </Space>
+            </form>
           </>
         );
       default:
@@ -234,7 +272,7 @@ const App = () => {
   };
 
   return (
-    <Layout>
+    <Layout className="layout">
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="demo-logo-vertical" />
         <Menu
@@ -256,28 +294,21 @@ const App = () => {
             {
               key: '3',
               icon: <UploadOutlined />,
-              label: 'Información Cliente',
+              label: 'Editar Cliente',
             },
           ]}
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: '#fff' }}>
+        <Header className="header">
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            style={{ fontSize: '16px', width: 64, height: 64 }}
+            className="menu-button"
           />
         </Header>
-        <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 280,
-            background: '#fff',
-          }}
-        >
+        <Content className="content">
           {renderContent()}
         </Content>
       </Layout>
