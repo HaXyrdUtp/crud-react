@@ -1,15 +1,21 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
+import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UploadOutlined,
+  UserOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
+import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification } from 'antd';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { Table, Button, Input, Select, Space, Divider, Layout } from 'antd';
-import './App.css'
+import './App.css';
 
-//const estatusOptions = ['En curso', 'Stand by', 'Terminado'];
-const {Content} = Layout;
+const { Header, Sider, Content } = Layout;
 
-
-function App() {
+const App = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [selectedNav, setSelectedNav] = useState('1');
   const [clientes, setClientes] = useState([]);
   const [clienteNombre, setClienteNombre] = useState('');
   const [nombre, setNombre] = useState('');
@@ -17,6 +23,7 @@ function App() {
   const [mapa, setMapa] = useState('');
   const [estatus, setEstatus] = useState('');
   const [currentClienteId, setCurrentClienteId] = useState(null);
+  const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     const getClientes = async () => {
@@ -48,6 +55,11 @@ function App() {
       setUbicacion('');
       setMapa('');
       setEstatus('');
+      setSelectedNav('1');
+      api.success({
+        message: 'Cliente Agregado',
+        description: 'El cliente ha sido agregado con éxito.',
+      });
     } catch (error) {
       console.log(error);
     }
@@ -60,6 +72,7 @@ function App() {
     setMapa(cliente.mapa);
     setEstatus(cliente.estatus);
     setCurrentClienteId(cliente.id);
+    setSelectedNav('3'); // Switch to the 'nav 3' view for editing
   };
 
   const actualizarCliente = async (e) => {
@@ -85,20 +98,41 @@ function App() {
       setUbicacion('');
       setMapa('');
       setEstatus('');
-      setCurrentClienteId(false);
+      setCurrentClienteId(null);
+      setSelectedNav('1'); // Switch back to the 'Clientes' view after updating
+      api.success({
+        message: 'Cliente Editado',
+        description: 'El cliente ha sido editado con éxito.',
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const eliminarCliente = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'Proyectos', id));
-      const arrayFiltrado = clientes.filter(item => item.id !== id);
-      setClientes(arrayFiltrado);
-    } catch (error) {
-      console.log(error);
-    }
+  const eliminarCliente = (id) => {
+    const key = `open${Date.now()}`;
+    const btn = (
+      <Space>
+        <Button type="link" size="small" onClick={() => api.destroy()}>
+          Cancelar
+        </Button>
+        <Button type="primary" size="small" onClick={async () => {
+          await deleteDoc(doc(db, 'Proyectos', id));
+          const arrayFiltrado = clientes.filter(item => item.id !== id);
+          setClientes(arrayFiltrado);
+          api.destroy(key);
+        }}>
+          Confirmar
+        </Button>
+      </Space>
+    );
+    api.open({
+      message: 'Eliminar Cliente',
+      description: '¿Estás seguro que deseas eliminar este cliente?',
+      btn,
+      key,
+      onClose: () => console.log('Se ha cerrado la notificación.'),
+    });
   };
 
   const columns = [
@@ -109,6 +143,7 @@ function App() {
         text: cliente.clienteNombre,
         value: cliente.clienteNombre,
       })),
+      sorter: (a, b) => a.clienteNombre.length - b.clienteNombre.length,
       onFilter: (value, record) => record.clienteNombre.indexOf(value) === 0,
     },
     {
@@ -123,7 +158,6 @@ function App() {
     {
       title: 'Estatus del Proyecto',
       dataIndex: 'estatus',
-  
       onFilter: (value, record) => record.estatus === value,
     },
     {
@@ -142,70 +176,171 @@ function App() {
     console.log('params', pagination, filters, sorter, extra);
   };
 
-  return (
-    
-    <div className="container">
-      <h1>CRUD de Proyectos</h1>
-      <div className="row">
-        <div 
-          className="col"
-          style={{
-            padding: 24,
-            minHeight: 100
-          }}  
-        >
-          <Divider orientation="left" style={{fontSize:25}}>Clientes</Divider>
-          <Table
-            columns={columns}
-            dataSource={clientes.map(cliente => ({ ...cliente, key: cliente.id }))}
-            onChange={onChange}
-            pagination={{ pageSize: 5 }}
-          />
-        </div>
+  const renderContent = () => {
+    switch (selectedNav) {
+      case '1':
+        return (
+          <>
+            <Divider orientation="left" style={{ fontSize: 25 }}>Clientes</Divider>
+            <Table
+              columns={columns}
+              dataSource={clientes.map(cliente => ({ ...cliente, key: cliente.id }))}
+              onChange={onChange}
+              pagination={{ pageSize: 5 }}
+            />
+          </>
+        );
+      case '2':
+        return (
+          <>
+            <Divider orientation="left" style={{ fontSize: 25 }}>Agregar Cliente</Divider>
+            <form onSubmit={agregarCliente}>
+              <Space size="middle" direction="vertical" style={{ width: '100%' }}>
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el cliente"
+                  value={clienteNombre}
+                  onChange={e => setClienteNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el nombre"
+                  value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese la ubicación"
+                  value={ubicacion}
+                  onChange={e => setUbicacion(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el mapa"
+                  value={mapa}
+                  onChange={e => setMapa(e.target.value)}
+                />
+                <Select
+                  className="form-control mb-2"
+                  defaultValue="Estatus"
+                  onChange={e => setEstatus(e)}
+                  options={[
+                    { value: 'En curso', label: 'En curso' },
+                    { value: 'Stand By', label: 'Stand By' },
+                    { value: 'Terminado', label: 'Terminado' }
+                  ]}
+                />
+                <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">
+                  Agregar
+                </Button>
+              </Space>
+            </form>
+          </>
+        );
+      case '3':
+        return (
+          <>
+            <Divider orientation="left" style={{ fontSize: 25 }}>Editar Cliente</Divider>
+            <form onSubmit={actualizarCliente}>
+              <Space size="middle" direction="vertical" style={{ width: '100%' }}>
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el cliente"
+                  value={clienteNombre}
+                  onChange={e => setClienteNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el nombre"
+                  value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese la ubicación"
+                  value={ubicacion}
+                  onChange={e => setUbicacion(e.target.value)}
+                />
+                <Input
+                  type="text"
+                  className="form-control mb-2"
+                  placeholder="Ingrese el mapa"
+                  value={mapa}
+                  onChange={e => setMapa(e.target.value)}
+                />
+                <Select
+                  className="form-control mb-2"
+                  defaultValue={estatus}
+                  onChange={e => setEstatus(e)}
+                  options={[
+                    { value: 'En curso', label: 'En curso' },
+                    { value: 'Stand By', label: 'Stand By' },
+                    { value: 'Terminado', label: 'Terminado' }
+                  ]}
+                />
+                <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">
+                  Confirmar
+                </Button>
+              </Space>
+            </form>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
 
-        <div 
-          className="col"
-          style={{
-            padding: 24,
-            minHeight: 360
-          }}
-        >
-        <Divider orientation="left" style={{fontSize:25}}>{currentClienteId ? 'Editar Cliente' : 'Agregar Cliente'}</Divider>
-          <form onSubmit={currentClienteId ? actualizarCliente : agregarCliente}>
-            <Space size ="middle">
-              <Input type="text" className="form-control mb-2" placeholder="Ingrese el cliente" value={clienteNombre} onChange={e => setClienteNombre(e.target.value)} style={{width: '100%'}}/>
-              <Input type="text" className="form-control mb-2" placeholder="Ingrese el nombre" value={nombre} onChange={e => setNombre(e.target.value)} style={{width: '100%'}}/>
-              <Input type="text" className="form-control mb-2" placeholder="Ingrese la ubicación" value={ubicacion} onChange={e => setUbicacion(e.target.value)} style={{width: '100%'}}/>
-              <Input type="text" className="form-control mb-2" placeholder="Ingrese el mapa" value={mapa} onChange={e => setMapa(e.target.value)} style={{width: '100%'}}/>
-              <Select 
-                className="form-control mb-2"
-                style={
-                  {width: 130}
-                }
-                defaultValue="Estatus"
-                onChange={e => setEstatus(e)}
-                options={[
-                  {
-                    value: 'En curso',
-                    label: 'En curso'
-                  },
-                  {
-                    value: 'Stand By',
-                    label: 'Stand By'
-                  },
-                  {
-                    value: 'Terminado',
-                    label: 'Terminado'
-                  }
-                ]}  
-              />
-              <Button type="primary" htmlType="submit" className="btn btn-primary btn-block">{currentClienteId ? 'Editar' : 'Agregar'}</Button>
-            </Space>
-          </form>
-        </div>
-      </div>
-    </div>
+  return (
+    <Layout className="layout">
+      {contextHolder}
+      <Sider trigger={null} collapsible collapsed={collapsed}>
+        <div className="demo-logo-vertical" />
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultSelectedKeys={['1']}
+          onClick={({ key }) => setSelectedNav(key)}
+          items={[
+            {
+              key: '1',
+              icon: <UserOutlined />,
+              label: 'Clientes',
+            },
+            {
+              key: '2',
+              icon: <VideoCameraOutlined />,
+              label: 'Agregar Clientes',
+            },
+            {
+              key: '3',
+              icon: <UploadOutlined />,
+              label: 'Editar Cliente',
+            },
+          ]}
+        />
+      </Sider>
+      <Layout>
+        <Header className="header">
+          <Button
+            type="text"
+            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+            className="menu-button"
+          />
+        </Header>
+        <Content className="content">
+          {renderContent()}
+        </Content>
+      </Layout>
+    </Layout>
   );
-}
+};
 
 export default App;
