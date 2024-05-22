@@ -12,7 +12,7 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
-const {Title} = Typography;
+const {Text} = Typography;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -197,7 +197,7 @@ const App = () => {
             <Divider orientation="left" style={{ fontSize: 25 }}>Agregar Cliente</Divider>
             <form onSubmit={agregarCliente}>
               <Space size="middle" direction="vertical" style={{ width: '100%' }}>
-                <Title level={5}>Cliente</Title>
+                <Text strong>Cliente</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -205,7 +205,7 @@ const App = () => {
                   value={clienteNombre}
                   onChange={e => setClienteNombre(e.target.value)}
                 />
-                <Title level={5}>Nombre</Title>
+                <Text strong>Nombre</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -213,7 +213,7 @@ const App = () => {
                   value={nombre}
                   onChange={e => setNombre(e.target.value)}
                 />
-                <Title level={5}>Ubicación</Title>
+                <Text strong>Ubicación</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -221,7 +221,7 @@ const App = () => {
                   value={ubicacion}
                   onChange={e => setUbicacion(e.target.value)}
                 />
-                <Title level={5}>Mapa</Title>
+                <Text strong>Mapa</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -229,7 +229,7 @@ const App = () => {
                   value={mapa}
                   onChange={e => setMapa(e.target.value)}
                 />
-                <Title level={5}>Estatus</Title>
+                <Text strong>Estatus</Text>
                 <Select
                   className="form-control mb-2"
                   defaultValue="Estatus"
@@ -253,6 +253,7 @@ const App = () => {
             <Divider orientation="left" style={{ fontSize: 25 }}>Editar Cliente</Divider>
             <form onSubmit={actualizarCliente}>
               <Space size="middle" direction="vertical" style={{ width: '100%' }}>
+                <Text strong>Cliente</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -260,6 +261,7 @@ const App = () => {
                   value={clienteNombre}
                   onChange={e => setClienteNombre(e.target.value)}
                 />
+                <Text strong>Nombre</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -267,6 +269,7 @@ const App = () => {
                   value={nombre}
                   onChange={e => setNombre(e.target.value)}
                 />
+                <Text strong>Ubicacion</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -274,6 +277,7 @@ const App = () => {
                   value={ubicacion}
                   onChange={e => setUbicacion(e.target.value)}
                 />
+                <Text strong>Mapa</Text>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -281,9 +285,10 @@ const App = () => {
                   value={mapa}
                   onChange={e => setMapa(e.target.value)}
                 />
+                <Text strong>Estatus</Text>
                 <Select
                   className="form-control mb-2"
-                  defaultValue={estatus}
+                  defaultValue={"Seleccione"}
                   onChange={e => setEstatus(e)}
                   options={[
                     { value: 'En curso', label: 'En curso' },
