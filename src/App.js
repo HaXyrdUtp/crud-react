@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
   UserOutlined,
   PlusCircleFilled,
   EditFilled,
@@ -28,6 +27,10 @@ const App = () => {
   const [estatus, setEstatus] = useState('');
   const [currentClienteId, setCurrentClienteId] = useState(null);
   const [api, contextHolder] = notification.useNotification();
+
+  const handleMenuClick = (e) => {
+    setSelectedNav(e.key);
+  };
 
   useEffect(() => {
     const getClientes = async () => {
@@ -76,7 +79,7 @@ const App = () => {
     setMapa(cliente.mapa);
     setEstatus(cliente.estatus);
     setCurrentClienteId(cliente.id);
-    setSelectedNav('3'); // Switch to the 'nav 3' view for editing
+    setSelectedNav('3');
   };
 
   const actualizarCliente = async (e) => {
@@ -103,7 +106,7 @@ const App = () => {
       setMapa('');
       setEstatus('');
       setCurrentClienteId(null);
-      setSelectedNav('1'); // Switch back to the 'Clientes' view after updating
+      setSelectedNav('1'); 
       api.success({
         message: 'Cliente Editado',
         description: 'El cliente ha sido editado con éxito.',
@@ -331,7 +334,8 @@ const App = () => {
           theme="dark"
           mode="inline"
           defaultSelectedKeys={['1']}
-          onClick={({ key }) => setSelectedNav(key)}
+          selectedKeys={[selectedNav]}
+          onClick= {handleMenuClick}
           items={[
             {
               key: '1',

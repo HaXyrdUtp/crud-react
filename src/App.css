@@ -62,3 +62,8 @@ html, body, #root, .ant-layout {
 .layout {
   height: 100%;
 }
+
+.selected-tab{
+  background-color: #1890ff;
+  color: white;
+}
