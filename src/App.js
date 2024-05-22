@@ -5,8 +5,11 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  EditFilled,
+  DeleteFilled
 } from '@ant-design/icons';
-import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification, Typography } from 'antd';
+
+import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification, Typography, Tooltip } from 'antd';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import './App.css';
@@ -166,8 +169,18 @@ const App = () => {
       dataIndex: 'acciones',
       render: (_, record) => (
         <>
-          <Button type="link" onClick={() => editarCliente(record)}>Editar</Button>
-          <Button type="link" onClick={() => eliminarCliente(record.id)}>Eliminar</Button>
+          <Button type = "primary" onClick={() => editarCliente(record)}>
+            <Tooltip title="Editar">
+              <EditFilled />
+            </Tooltip>
+            
+          </Button>
+
+          <Button type="primary" danger onClick={() => eliminarCliente(record.id) }>
+            <Tooltip title="Eliminar">
+              <DeleteFilled />
+            </Tooltip>
+          </Button>
         </>
       ),
     },
