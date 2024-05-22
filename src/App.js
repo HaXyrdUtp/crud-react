@@ -4,7 +4,7 @@ import {
   MenuUnfoldOutlined,
   UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
+  PlusCircleFilled,
   EditFilled,
   DeleteFilled
 } from '@ant-design/icons';
@@ -15,7 +15,7 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
-const {Text} = Typography;
+const {Title, Text} = Typography;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -169,6 +169,7 @@ const App = () => {
       dataIndex: 'acciones',
       render: (_, record) => (
         <>
+        <Space>
           <Button type = "primary" onClick={() => editarCliente(record)}>
             <Tooltip title="Editar">
               <EditFilled />
@@ -181,6 +182,7 @@ const App = () => {
               <DeleteFilled />
             </Tooltip>
           </Button>
+        </Space>
         </>
       ),
     },
@@ -325,7 +327,6 @@ const App = () => {
     <Layout className="layout">
       {contextHolder}
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
           mode="inline"
@@ -339,12 +340,12 @@ const App = () => {
             },
             {
               key: '2',
-              icon: <VideoCameraOutlined />,
+              icon: <PlusCircleFilled />,
               label: 'Agregar Clientes',
             },
             {
               key: '3',
-              icon: <UploadOutlined />,
+              icon: <EditFilled/>,
               label: 'Editar Cliente',
             },
           ]}
