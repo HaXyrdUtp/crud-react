@@ -6,7 +6,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, Table, Input, Select, Space, Divider } from 'antd';
+import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification } from 'antd';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import './App.css';
@@ -23,6 +23,7 @@ const App = () => {
   const [mapa, setMapa] = useState('');
   const [estatus, setEstatus] = useState('');
   const [currentClienteId, setCurrentClienteId] = useState(null);
+  const [api, contextHolder] = notification.useNotification();
 
   useEffect(() => {
     const getClientes = async () => {
@@ -54,6 +55,11 @@ const App = () => {
       setUbicacion('');
       setMapa('');
       setEstatus('');
+      setSelectedNav('1');
+      api.success({
+        message: 'Cliente Agregado',
+        description: 'El cliente ha sido agregado con éxito.',
+      });
     } catch (error) {
       console.log(error);
     }
@@ -94,19 +100,39 @@ const App = () => {
       setEstatus('');
       setCurrentClienteId(null);
       setSelectedNav('1'); // Switch back to the 'Clientes' view after updating
+      api.success({
+        message: 'Cliente Editado',
+        description: 'El cliente ha sido editado con éxito.',
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const eliminarCliente = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'Proyectos', id));
-      const arrayFiltrado = clientes.filter(item => item.id !== id);
-      setClientes(arrayFiltrado);
-    } catch (error) {
-      console.log(error);
-    }
+  const eliminarCliente = (id) => {
+    const key = `open${Date.now()}`;
+    const btn = (
+      <Space>
+        <Button type="link" size="small" onClick={() => api.destroy()}>
+          Cancelar
+        </Button>
+        <Button type="primary" size="small" onClick={async () => {
+          await deleteDoc(doc(db, 'Proyectos', id));
+          const arrayFiltrado = clientes.filter(item => item.id !== id);
+          setClientes(arrayFiltrado);
+          api.destroy(key);
+        }}>
+          Confirmar
+        </Button>
+      </Space>
+    );
+    api.open({
+      message: 'Eliminar Cliente',
+      description: '¿Estás seguro que deseas eliminar este cliente?',
+      btn,
+      key,
+      onClose: () => console.log('Se ha cerrado la notificación.'),
+    });
   };
 
   const columns = [
@@ -273,6 +299,7 @@ const App = () => {
 
   return (
     <Layout className="layout">
+      {contextHolder}
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="demo-logo-vertical" />
         <Menu
