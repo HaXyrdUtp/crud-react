@@ -6,12 +6,13 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification } from 'antd';
+import { Button, Layout, Menu, Table, Input, Select, Space, Divider, notification, Typography } from 'antd';
 import { db } from './firebase';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
+const {Title} = Typography;
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -196,6 +197,7 @@ const App = () => {
             <Divider orientation="left" style={{ fontSize: 25 }}>Agregar Cliente</Divider>
             <form onSubmit={agregarCliente}>
               <Space size="middle" direction="vertical" style={{ width: '100%' }}>
+                <Title level={5}>Cliente</Title>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -203,6 +205,7 @@ const App = () => {
                   value={clienteNombre}
                   onChange={e => setClienteNombre(e.target.value)}
                 />
+                <Title level={5}>Nombre</Title>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -210,6 +213,7 @@ const App = () => {
                   value={nombre}
                   onChange={e => setNombre(e.target.value)}
                 />
+                <Title level={5}>Ubicación</Title>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -217,6 +221,7 @@ const App = () => {
                   value={ubicacion}
                   onChange={e => setUbicacion(e.target.value)}
                 />
+                <Title level={5}>Mapa</Title>
                 <Input
                   type="text"
                   className="form-control mb-2"
@@ -224,6 +229,7 @@ const App = () => {
                   value={mapa}
                   onChange={e => setMapa(e.target.value)}
                 />
+                <Title level={5}>Estatus</Title>
                 <Select
                   className="form-control mb-2"
                   defaultValue="Estatus"
